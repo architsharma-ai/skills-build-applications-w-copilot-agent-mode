@@ -1,23 +1,26 @@
 import express from 'express';
 import dbConfig from './config/database.ts';
 import apiRouter from './routes/api.ts';
-import apiConfig from './config/apiConfig.ts';
 
 const app = express();
-const port = apiConfig.port;
+const port = Number(process.env.PORT) || 8000;
+const codespaceName = process.env.CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-${port}.app.github.dev`
+  : `http://localhost:${port}`;
 
 app.use(express.json());
 app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
-  res.json({ message: 'OctoFit Tracker backend is running', apiBaseUrl: apiConfig.apiBaseUrl });
+  res.json({ message: 'OctoFit Tracker backend is running', apiBaseUrl });
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', port, apiBaseUrl: apiConfig.apiBaseUrl });
+  res.json({ status: 'ok', port, apiBaseUrl });
 });
 
 app.listen(port, () => {
-  console.log(`Backend running on ${apiConfig.apiBaseUrl}`);
+  console.log(`Backend running on ${apiBaseUrl}`);
   dbConfig;
 });
